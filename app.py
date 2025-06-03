@@ -11,9 +11,22 @@ st.set_page_config(page_title="🎓 Student Dropout Prediction", layout="wide")
 # LOAD MODEL AND EXPECTED COLUMNS 
 @st.cache_resource
 def load_model_and_columns():
-    model = joblib.load("./dropout_retention_model.pkl")
-    model_columns = joblib.load("./model_columns.pkl")
+    model = joblib.load("./scripts/dropout_retention_model_2.pkl")
+    model_columns = joblib.load("./scripts/model_columns_2.pkl")
     return model, model_columns
+
+def validate_category(col_name: str, mapped_value: str) -> str:
+    """
+    Jika dummy column f"{col_name}_{mapped_value}" tidak ada di model_columns,
+    maka kembalikan "Other". 
+    Otherwise return mapped_value.
+    """
+    print(f"mapped value : {mapped_value}")
+    dummy_name = f"{col_name}_{mapped_value}"
+    if dummy_name not in model_columns:
+        return "Other"
+    return mapped_value
+
 
 model, model_columns = load_model_and_columns()
 
@@ -387,10 +400,10 @@ with st.expander("Academic History", expanded=False):
     app_order       = st.number_input("Application order", min_value=0, step=1, value=None)
     st.caption("(0 = first choice, 9 = last)")
     
-    prev_qual_grade = st.number_input("Previous qualification grade", min_value=0.0, max_value=20.0, format="%.2f", value=None)
+    prev_qual_grade = st.number_input("Previous qualification grade", min_value=0.0, max_value=200.0, format="%.2f", value=None)
     st.caption("(0–200)")
     
-    admission_grade = st.number_input("Admission grade", min_value=0.0, max_value=20.0, format="%.2f", value=None)
+    admission_grade = st.number_input("Admission grade", min_value=0.0, max_value=200.0, format="%.2f", value=None)
     st.caption("(0–200)")
 
 with st.expander("Academic Performance", expanded=False):
@@ -483,7 +496,7 @@ if st.button("🔍 Predict Dropout"):
             "Application mode": app_mode_mapping[application_code],
             "Course": course_mapping[course_code],
             "Previous qualification": prev_qual_mapping[prev_qual_code],
-            "Nacionality": nationality_mapping[nationality_code],
+            "Nacionality": validate_category("Nacionality", nationality_mapping[nationality_code]),
             "Mother's qualification": qualification_mapping[mothers_qual_code],
             "Father's qualification": qualification_mapping[fathers_qual_code],
             "Mother's occupation": mothers_occupation_mapping[mothers_occ_code],
@@ -539,6 +552,10 @@ if st.button("🔍 Predict Dropout"):
 
         # reindex to match columns used during training
         df_encoded = df_encoded.reindex(columns=model_columns, fill_value=0)
+        
+        # df_encoded.info()
+        
+        # df_encoded.to_excel('one_row_df.xlsx',index=False)
 
         # PREDICT & DISPLAY
         pred = model.predict(df_encoded)[0]
