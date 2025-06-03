@@ -34,7 +34,7 @@ pip install -r requirements.txt
 streamlit run app.py
 
 # link streamlit
-https://student-dropout-prediction-4qdcyvy3g5vcpnprchcsgm.streamlit.app/
+https://student-dropout-prediction-8re65kgqfkzjuxkab3qxzv.streamlit.app/
 
 # metabase credentials
 username : medianosandie@gmail.com
