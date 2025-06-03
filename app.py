@@ -11,8 +11,8 @@ st.set_page_config(page_title="🎓 Student Dropout Prediction", layout="wide")
 # LOAD MODEL AND EXPECTED COLUMNS 
 @st.cache_resource
 def load_model_and_columns():
-    model = joblib.load("./scripts/dropout_retention_model.pkl")
-    model_columns = joblib.load("./scripts/model_columns.pkl")
+    model = joblib.load("dropout_retention_model.pkl")
+    model_columns = joblib.load("model_columns.pkl")
     return model, model_columns
 
 def validate_category(col_name: str, mapped_value: str) -> str:
